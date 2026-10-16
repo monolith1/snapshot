@@ -1,0 +1,160 @@
+@import 'tailwindcss';
+@import 'maplibre-gl/dist/maplibre-gl.css';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: 'Instrument Serif', ui-serif, Georgia, serif;
+
+  --color-ink: #0a0a0a;
+  --color-ink-2: #121212;
+  --color-ink-3: #1c1c1c;
+  --color-paper: #f5f1e8;
+  --color-mute: #8a8780;
+  --color-accent: #ff5a36;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink text-paper font-sans antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: var(--color-ink);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+/* ---------- Map markers ---------- */
+.snap-marker {
+  cursor: pointer;
+  width: 44px; /* generous touch target */
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.snap-marker__dot {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+  border: 3px solid var(--color-ink);
+  box-shadow: 0 0 0 1.5px rgba(245, 241, 232, 0.55), 0 6px 18px rgba(0, 0, 0, 0.6);
+  transition:
+    transform 250ms var(--ease-out-expo),
+    background-color 200ms ease;
+}
+.snap-marker:hover .snap-marker__dot {
+  transform: scale(1.25);
+}
+.snap-marker__label {
+  position: absolute;
+  left: 50%;
+  top: calc(100% - 6px);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font: 500 11px/1 var(--font-sans);
+  letter-spacing: 0.02em;
+  color: var(--color-paper);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 8px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+.snap-marker:hover .snap-marker__label,
+.snap-map--zoomed .snap-marker__label,
+.snap-marker.is-active .snap-marker__label {
+  opacity: 1;
+}
+.snap-marker.is-active {
+  z-index: 10;
+}
+.snap-marker.is-active .snap-marker__dot {
+  background: var(--color-accent);
+  transform: scale(1.35);
+}
+.snap-marker.is-active .snap-marker__dot::after {
+  content: '';
+  position: absolute;
+  inset: -9px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-accent);
+  animation: snap-pulse 1.8s var(--ease-out-expo) infinite;
+}
+@keyframes snap-pulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Admin coordinate picker marker */
+.pick-marker {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  border: 3px solid var(--color-ink);
+  box-shadow: 0 0 0 2px var(--color-paper);
+  cursor: grab;
+}
+
+/* Quiet MapLibre chrome */
+.maplibregl-ctrl-attrib {
+  background: rgba(10, 10, 10, 0.6) !important;
+  color: var(--color-mute) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--color-mute) !important;
+}
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+.maplibregl-ctrl-group {
+  background: rgba(18, 18, 18, 0.85) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: none !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
